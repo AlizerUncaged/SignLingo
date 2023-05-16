@@ -1,0 +1,248 @@
+﻿<script src="https://cdn.jsdelivr.net/npm/@@tensorflow/tfjs/dist/tf.min.js">
+
+</script>
+
+@{
+
+}
+
+<div class="container position-relative mx-auto" id="liveview">
+    <div class="position-absolute start-0 top-0 container">
+        <video autoplay muted width="640" height="640" id="webcam"></video>
+    </div>
+    <div class="position-absolute start-0 top-0 container">
+      <canvas id="live-canvas" width="640" height="640" 
+              style="z-index: 99; width: 640px !important; height: 640px !important;"></canvas>
+    </div>
+</div>
+
+<script>
+const MODEL_PATH  = "/model/model.json"
+let model, cam = document.getElementById("webcam"), liveView = document.getElementById("liveview")
+
+function getUserMediaSupported() {
+  return !!(navigator.mediaDevices &&
+    navigator.mediaDevices.getUserMedia);
+}
+var children = [];
+
+const preprocess = (source, modelWidth, modelHeight) => {
+  let xRatio, yRatio; // ratios for boxes
+
+  const input = tf.tidy(() => {
+  let img;
+    try {
+       img = tf.browser.fromPixels(cam);
+    }
+    catch {
+      return null;
+    }
+
+    // padding image to square => [n, m] to [n, n], n > m
+    const [h, w] = img.shape.slice(0, 2); // get source width and height
+    const maxSize = Math.max(w, h); // get max size
+    const imgPadded = img.pad([
+      [0, maxSize - h], // padding y [bottom only]
+      [0, maxSize - w], // padding x [right only]
+      [0, 0],
+    ]);
+
+    xRatio = maxSize / w; // update xRatio
+    yRatio = maxSize / h; // update yRatio
+
+    return tf.image
+      .resizeBilinear(imgPadded, [modelWidth, modelHeight]) // resize frame
+      .div(255.0) // normalize
+      .expandDims(0); // add batch
+  });
+
+  return [input, xRatio, yRatio];
+};
+
+
+const detectVideo = (vidSource, model, classThreshold, canvasRef) => {
+  //const [modelWidth, modelHeight] = model.inputs[0].shape(1, 3); // get model width and height
+  const modelWidth = 640;
+  const modelHeight = 640;
+  
+  if (vidSource.width === 0 && vidSource.src == null)
+    return;
+  /**
+   * Function to detect every frame from video
+   */
+  const detectFrame = async () => {
+    // if (vidSource.videoWidth === 0 && vidSource.srcObject === null) {
+    //   const ctx = canvasRef.getContext("2d");
+    //   ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height); // clean canvas
+    //   return; // handle if source is closed
+    // }
+
+    tf.engine().startScope(); // start scoping tf engine
+    const [input, xRatio, yRatio] = preprocess(vidSource, modelWidth, modelHeight);
+    
+    if (!input)
+    {
+      console.log(`Invalid preprocess return!`)
+      requestAnimationFrame(detectFrame); // get another frame
+      tf.engine().endScope(); // end of scoping
+      return;
+    }
+
+    await model.executeAsync(input).then((res) => {
+      const [boxes, scores, classes] = res.slice(0, 3);
+      const boxes_data = boxes.dataSync();
+      const scores_data = scores.dataSync();
+      const classes_data = classes.dataSync();
+      
+      
+      renderBoxes(canvasRef, classThreshold, boxes_data, scores_data, classes_data, [
+        xRatio,
+        yRatio,
+      ]); // render boxes
+      
+      tf.dispose(res); // clear memory
+    });
+
+    requestAnimationFrame(detectFrame); // get another frame
+    
+    tf.engine().endScope(); // end of scoping
+  };
+
+  detectFrame(); // initialize to detect every frame
+};
+
+
+
+async function loadModel()
+{
+    model = await tf.loadGraphModel(MODEL_PATH)
+    console.log(`Mode loaded successfully! Warming up model.`)
+    
+    // Warmup model.
+    const dummyInput = tf.ones(model.inputs[0].shape);
+    const warmupResult = await model.executeAsync(dummyInput);
+    console.log(`Warmup result: ${warmupResult}`)
+    tf.dispose(warmupResult); // cleanup memory
+    tf.dispose(dummyInput); // cleanup memory
+    
+    // Activate the webcam stream.
+    navigator.mediaDevices.getUserMedia({ video: true}).then(function(stream) {
+        cam.srcObject = stream;
+        // cam.addEventListener('loadeddata', predictWebcam);
+    });
+    detectVideo(cam, model, 0.2, document.getElementById("live-canvas"))
+}
+
+loadModel();
+
+labels=[];
+
+for (let i = 65; i <= 90; i++) {
+  const letter = String.fromCharCode(i);
+  labels.push(letter);
+}
+
+const renderBoxes = (
+  canvasRef,
+  classThreshold,
+  boxes_data,
+  scores_data,
+  classes_data,
+  ratios
+) => {
+  const ctx = canvasRef.getContext("2d");
+  ctx.clearRect(0, 0, ctx.canvas.width, ctx.canvas.height); // clean canvas
+
+  const colors = new Colors();
+
+  // font configs
+  const font = `${Math.max(
+    Math.round(Math.max(ctx.canvas.width, ctx.canvas.height) / 40),
+    14
+  )}px Arial`;
+  ctx.font = font;
+  ctx.textBaseline = "top";
+
+  for (let i = 0; i < scores_data.length; ++i) {
+    // filter based on class threshold
+    if (scores_data[i] > classThreshold) {
+      const klass = labels[classes_data[i]];
+      console.log(`Detected: ${klass}`)
+      const color = colors.get(classes_data[i]);
+      const score = (scores_data[i] * 100).toFixed(1);
+
+      let [x1, y1, x2, y2] = boxes_data.slice(i * 4, (i + 1) * 4);
+      x1 *= canvasRef.width * ratios[0];
+      x2 *= canvasRef.width * ratios[0];
+      y1 *= canvasRef.height * ratios[1];
+      y2 *= canvasRef.height * ratios[1];
+      const width = x2 - x1;
+      const height = y2 - y1;
+
+      // draw box.
+      ctx.fillStyle = Colors.hexToRgba(color, 0.2);
+      ctx.fillRect(x1, y1, width, height);
+      // draw border box.
+      ctx.strokeStyle = color;
+      ctx.lineWidth = Math.max(Math.min(ctx.canvas.width, ctx.canvas.height) / 200, 2.5);
+      ctx.strokeRect(x1, y1, width, height);
+
+      // Draw the label background.
+      ctx.fillStyle = color;
+      const textWidth = ctx.measureText(klass + " - " + score + "%").width;
+      const textHeight = parseInt(font, 10); // base 10
+      const yText = y1 - (textHeight + ctx.lineWidth);
+      ctx.fillRect(
+        x1 - 1,
+        yText < 0 ? 0 : yText, // handle overflow label box
+        textWidth + ctx.lineWidth,
+        textHeight + ctx.lineWidth
+      );
+
+      // Draw labels
+      ctx.fillStyle = "#ffffff";
+      ctx.fillText(klass + " - " + score + "%", x1 - 1, yText < 0 ? 0 : yText);
+    }
+  }
+};
+
+class Colors {
+  // ultralytics color palette https://ultralytics.com/
+  constructor() {
+    this.palette = [
+      "#FF3838",
+      "#FF9D97",
+      "#FF701F",
+      "#FFB21D",
+      "#CFD231",
+      "#48F90A",
+      "#92CC17",
+      "#3DDB86",
+      "#1A9334",
+      "#00D4BB",
+      "#2C99A8",
+      "#00C2FF",
+      "#344593",
+      "#6473FF",
+      "#0018EC",
+      "#8438FF",
+      "#520085",
+      "#CB38FF",
+      "#FF95C8",
+      "#FF37C7",
+    ];
+    this.n = this.palette.length;
+  }
+
+  get = (i) => this.palette[Math.floor(i) % this.n];
+
+  static hexToRgba = (hex, alpha) => {
+    var result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+    return result
+      ? `rgba(${[parseInt(result[1], 16), parseInt(result[2], 16), parseInt(result[3], 16)].join(
+          ", "
+        )}, ${alpha})`
+      : null;
+  };
+}
+</script>

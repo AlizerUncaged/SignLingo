@@ -1,0 +1,33 @@
+﻿@{
+    ViewData["Title"] = "Welcome <3";
+}
+@if (User.Identity is {IsAuthenticated:true})
+{
+    
+    <div class="text-center">
+        <partial name="Detection"/>
+    </div>
+}
+else
+{
+    // Not signed in.
+    <div class="container d-flex justify-content-center align-items-center flex-column" style="min-height: 75vh">
+        <div class="container-fluid d-flex justify-content-center">
+            <p class="fw-bolder text-center h1 text-white">
+                Welcome to <span class="text-success yas">Slingo!</span>
+            </p>
+        </div>
+        <div class="container-fluid d-flex justify-content-center mb-3">
+            <img class="img-fluid" src="images/tenderness.png"/>
+        </div>
+        <div class="container-fluid d-flex justify-content-center">
+            <p class="fw-bold text-center text-light">
+                The easiest way to learn FSL!
+            </p>
+        </div>
+        <div class="container-fluid d-flex justify-content-center">
+            <a class="btn btn-success px-4 border-0 me-2 text-dark shadow" asp-area="Identity" asp-page="/Account/Login"><i class="fa-solid fa-user me-2"></i>Sign In!</a>
+            <a class="btn btn-danger px-4 border-0 text-dark shadow" asp-area="Identity" asp-page="/Account/Register">Register an Account</a>
+        </div>
+    </div>
+}
