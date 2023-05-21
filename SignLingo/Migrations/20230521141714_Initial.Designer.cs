@@ -2,17 +2,20 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SignLingo.Data;
 
 #nullable disable
 
-namespace SignLingo.Data.Migrations
+namespace SignLingo.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230521141714_Initial")]
+    partial class Initial
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "7.0.5");
@@ -219,10 +222,6 @@ namespace SignLingo.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("ActivityDescription")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
                     b.Property<int>("ActivityType")
                         .HasColumnType("INTEGER");
 
@@ -246,51 +245,9 @@ namespace SignLingo.Data.Migrations
                         .ValueGeneratedOnAdd()
                         .HasColumnType("INTEGER");
 
-                    b.Property<string>("LessonDescription")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("LessonReviewer")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<string>("LessonTitle")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
-                    b.Property<long?>("UserMetadataId")
-                        .HasColumnType("INTEGER");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("UserMetadataId");
 
                     b.ToTable("Lessons");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1L,
-                            LessonDescription = "# Lesson 1: FSL Greetings\r\n\r\nGet ready to dive into the exciting world of Filipino Sign Language (FSL) greetings! 🌟✋ In this cozy lesson, you'll learn how to sign some \r\ndelightful greetings that will make your heart flutter. Whether you're saying hello, bidding farewell, or asking someone how they're doing, \r\nFSL has the perfect signs to express warmth and friendliness. 🤗💬",
-                            LessonReviewer = "",
-                            LessonTitle = "Greetings!"
-                        });
-                });
-
-            modelBuilder.Entity("SignLingo.Data.UserMetadata", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("UserId")
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("UserMetadatas");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -357,28 +314,7 @@ namespace SignLingo.Data.Migrations
 
             modelBuilder.Entity("SignLingo.Data.Lesson", b =>
                 {
-                    b.HasOne("SignLingo.Data.UserMetadata", null)
-                        .WithMany("FinishedLessons")
-                        .HasForeignKey("UserMetadataId");
-                });
-
-            modelBuilder.Entity("SignLingo.Data.UserMetadata", b =>
-                {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId");
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("SignLingo.Data.Lesson", b =>
-                {
                     b.Navigation("Activities");
-                });
-
-            modelBuilder.Entity("SignLingo.Data.UserMetadata", b =>
-                {
-                    b.Navigation("FinishedLessons");
                 });
 #pragma warning restore 612, 618
         }

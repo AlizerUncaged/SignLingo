@@ -2,17 +2,20 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SignLingo.Data;
 
 #nullable disable
 
-namespace SignLingo.Data.Migrations
+namespace SignLingo.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230521144410_UpdatedMoreMetadata")]
+    partial class UpdatedMoreMetadata
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "7.0.5");
@@ -258,12 +261,7 @@ namespace SignLingo.Data.Migrations
                         .IsRequired()
                         .HasColumnType("TEXT");
 
-                    b.Property<long?>("UserMetadataId")
-                        .HasColumnType("INTEGER");
-
                     b.HasKey("Id");
-
-                    b.HasIndex("UserMetadataId");
 
                     b.ToTable("Lessons");
 
@@ -275,22 +273,6 @@ namespace SignLingo.Data.Migrations
                             LessonReviewer = "",
                             LessonTitle = "Greetings!"
                         });
-                });
-
-            modelBuilder.Entity("SignLingo.Data.UserMetadata", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("INTEGER");
-
-                    b.Property<string>("UserId")
-                        .HasColumnType("TEXT");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("UserId");
-
-                    b.ToTable("UserMetadatas");
                 });
 
             modelBuilder.Entity("Microsoft.AspNetCore.Identity.IdentityRoleClaim<string>", b =>
@@ -357,28 +339,7 @@ namespace SignLingo.Data.Migrations
 
             modelBuilder.Entity("SignLingo.Data.Lesson", b =>
                 {
-                    b.HasOne("SignLingo.Data.UserMetadata", null)
-                        .WithMany("FinishedLessons")
-                        .HasForeignKey("UserMetadataId");
-                });
-
-            modelBuilder.Entity("SignLingo.Data.UserMetadata", b =>
-                {
-                    b.HasOne("Microsoft.AspNetCore.Identity.IdentityUser", "User")
-                        .WithMany()
-                        .HasForeignKey("UserId");
-
-                    b.Navigation("User");
-                });
-
-            modelBuilder.Entity("SignLingo.Data.Lesson", b =>
-                {
                     b.Navigation("Activities");
-                });
-
-            modelBuilder.Entity("SignLingo.Data.UserMetadata", b =>
-                {
-                    b.Navigation("FinishedLessons");
                 });
 #pragma warning restore 612, 618
         }
