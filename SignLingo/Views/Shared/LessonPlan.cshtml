@@ -1,0 +1,43 @@
+﻿@using SignLingo.Data
+@using Microsoft.EntityFrameworkCore
+@using Markdig
+@using Microsoft.AspNetCore.Identity
+@inject ApplicationDbContext DbContext 
+@inject UserManager<IdentityUser> UserManager 
+
+@{
+    var currentUser = await UserManager.GetUserAsync(User);
+
+    // currentUser is never null
+    var userMetadata = await DbContext.UserMetadatas.FirstOrDefaultAsync(x => x.User.Id == currentUser!.Id);
+    var lessons = await DbContext.Lessons.ToListAsync();
+}
+
+<div class="container-fluid row">
+    @foreach (var i in lessons)
+    {
+        <div class="col-6 col-md-3">
+            <div class="card border-0">
+                <img src="@i.LessonImage"
+                     class="card-img-top rounded-3 shadow" style="height: 300px; object-fit: cover">
+                <div class="card-body d-flex flex-column">
+                    <p class="card-title d-flex flex-row">
+                        <span class="fw-bold d-inline text-light me-2 h5 @(userMetadata!.FinishedLessons.Any(x => x.Id == i.Id) ? "text-decoration-line-through" : string.Empty)">@i.LessonTitle</span>
+                        <span class="rounded-3 d-inline bg-dark-subtle shadow px-2 align-middle">Lesson @i.Id</span>
+                    </p>
+                    <div class="card-text">
+                        @Html.Raw(Markdown.ToHtml(i.LessonDescription))
+                    </div>
+                    @* <p class="card-text" id="lesson-preview-@i.Id"> *@
+                    @*      *@
+                    @* </p> *@
+                    @* <script> *@
+                    @*     let lessonPrev = document.getElementById("lesson-preview-@i.Id"); *@
+                    @*     lessonPrev.innerHTML = marked.parse(`@i.LessonDescription`); *@
+                    @* </script> *@
+                    <a href="#" class="btn btn-success border-0 text-dark shadow fw-bold"><i class="fa-solid fa-play me-2"></i> Start</a>
+                </div>
+            </div>
+        </div>
+    }
+</div>

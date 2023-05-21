@@ -2,17 +2,20 @@
 using System;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using SignLingo.Data;
 
 #nullable disable
 
-namespace SignLingo.Data.Migrations
+namespace SignLingo.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20230521151415_AddedLessonImage")]
+    partial class AddedLessonImage
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder.HasAnnotation("ProductVersion", "7.0.5");
@@ -275,18 +278,10 @@ namespace SignLingo.Data.Migrations
                         new
                         {
                             Id = 1L,
-                            LessonDescription = "",
+                            LessonDescription = "# Lesson 1: FSL Greetings\r\n\r\nGet ready to dive into the exciting world of Filipino Sign Language (FSL) greetings! 🌟✋ In this cozy lesson, you'll learn how to sign some \r\ndelightful greetings that will make your heart flutter. Whether you're saying hello, bidding farewell, or asking someone how they're doing, \r\nFSL has the perfect signs to express warmth and friendliness. 🤗💬",
                             LessonImage = "https://cdn.dribbble.com/userupload/5212512/file/original-8f810bbb60971a8d674ceb8b0150ccbc.jpg?compress=1&resize=1024x1280",
                             LessonReviewer = "",
                             LessonTitle = "Greetings!"
-                        },
-                        new
-                        {
-                            Id = 2L,
-                            LessonDescription = "",
-                            LessonImage = "https://cdn.dribbble.com/users/648922/screenshots/15895262/media/dcd459092738c1ce081fa6948bdf0ff1.png",
-                            LessonReviewer = "",
-                            LessonTitle = "FSL Numbers"
                         });
                 });
 

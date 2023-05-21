@@ -15,8 +15,10 @@ public class Lesson
     /// Markdown of lesson reviewer.
     /// </summary>
     public string LessonReviewer { get; set; } = string.Empty;
-    
-    
+
+    public string LessonImage { get; set; } = string.Empty;
+
+
 
     public List<Activity> Activities { get; set; } = new();
 }
