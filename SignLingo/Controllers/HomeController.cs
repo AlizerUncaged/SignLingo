@@ -30,6 +30,11 @@ public class HomeController : Controller
         return View(await _databaseAbstract.GetDatabasePortAsync());
     }
 
+    public async Task<IActionResult> Signs()
+    {
+        return View();
+    }
+
     public IActionResult Privacy()
     {
         return View();
