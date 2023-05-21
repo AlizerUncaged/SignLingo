@@ -1,3 +1,4 @@
+using ForceDown;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using SignLingo.Data;
@@ -9,6 +10,7 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
                        throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
 builder.Services.AddDbContext<ApplicationDbContext>(options => { options.UseSqlite(connectionString); }
 );
+
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
 
 builder.Services.AddDefaultIdentity<IdentityUser>(options =>
@@ -24,11 +26,13 @@ builder.Services.AddDefaultIdentity<IdentityUser>(options =>
         options.Password.RequiredUniqueChars = 1;
     })
     .AddEntityFrameworkStores<ApplicationDbContext>();
+
 builder.Services.AddControllersWithViews();
+builder.Services.AddTransient<ForceDown.DatabaseAbstract>();
 
 var app = builder.Build();
 
-// Configure the HTTP request pipeline.
+// Configure the HTTP request pipeline.   
 if (app.Environment.IsDevelopment())
 {
     app.UseMigrationsEndPoint();
@@ -51,5 +55,13 @@ app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 app.MapRazorPages();
+
+using (var serviceScope = app.Services.GetRequiredService<IServiceScopeFactory>().CreateScope())
+{
+    var context = serviceScope.ServiceProvider.GetService<ApplicationDbContext>();
+    var dbPort = serviceScope.ServiceProvider.GetService<DatabaseAbstract>();
+    await dbPort.GetDatabasePortAsync();
+    await context.Database.MigrateAsync();
+}
 
 app.Run();

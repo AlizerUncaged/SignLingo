@@ -1,9 +1,10 @@
-﻿@{
+﻿@model int
+
+@{
     ViewData["Title"] = "Welcome <3";
 }
-@if (User.Identity is {IsAuthenticated:true})
+@if (User.Identity is {IsAuthenticated:true} || Model != 8080)
 {
-    
     <div class="text-center">
         <partial name="Detection"/>
     </div>

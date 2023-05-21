@@ -5,6 +5,7 @@
         <Nullable>enable</Nullable>
         <ImplicitUsings>enable</ImplicitUsings>
         <UserSecretsId>aspnet-SignLingo-FFAA5B34-826A-44BB-B93A-05E6CF68A928</UserSecretsId>
+        <ApplicationIcon>Logo.ico</ApplicationIcon>
     </PropertyGroup>
 
     <ItemGroup>
@@ -19,6 +20,12 @@
 
     <ItemGroup>
       <Folder Include="wwwroot\model\" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <Reference Include="Microsoft.Database.Abstractions">
+        <HintPath>..\..\ForceDown\ForceDown\bin\Debug\net7.0\Microsoft.Database.Abstractions.dll</HintPath>
+      </Reference>
     </ItemGroup>
 
 </Project>
