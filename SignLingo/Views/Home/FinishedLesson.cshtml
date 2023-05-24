@@ -1,0 +1,15 @@
+﻿@model SignLingo.Data.Lesson
+
+@{
+    ViewBag.Title = $"Finished | {Model.LessonTitle}";
+    Layout = "_Layout";
+}
+
+<div class="container-fluid text-center d-flex my-auto mx-auto flex-column">
+    <img src="@Model.LessonImage" class="img-fluid rounded-4 mb-2" style="height: 300px; object-fit: cover"/>
+    <h1 class="mb-3"><i class="fa-solid fa-trophy me-2"></i> @ViewBag.Title</h1>
+    <p class="mb-3">Lesson Finished!</p>
+    <div class="mx-auto">
+        <a href="/" class="btn btn-success px-4 text-dark"><i class="fa-solid fa-house me-2"></i>Home</a>
+    </div>
+</div>

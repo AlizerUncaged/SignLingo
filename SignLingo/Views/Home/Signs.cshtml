@@ -1,7 +1,77 @@
-﻿@{
+﻿@using SignLingo.Data
+@{
     // https://icons8.com/icons/set/asl
     ViewBag.Title = "Signs";
     Layout = "_Layout";
+
+    var signs = new List<string>()
+    {
+        "To sign the letter \"A\" in ASL, extend your dominant hand with all fingers pointing straight upward and your thumb resting against your palm. Keep your other fingers together, and your palm facing forward.",
+        "To sign the letter \"B\" in ASL, hold your dominant hand with your thumb extended and your four fingers closed together. Bring your thumb to touch the side of your palm, creating a letter \"B\" shape. Keep your palm facing inward.",
+        "To sign the letter \"C\" in ASL, extend your dominant hand with all fingers pointing straight upward and slightly apart. Curve your fingers inward, creating a gentle arch shape resembling the letter \"C\". Keep your palm facing forward.",
+        "To sign the letter \"D\" in ASL, start with your dominant hand in a fist position. Extend your thumb and index finger to create a small circle, while keeping your other fingers curled inside the fist. Hold the circle shape in front of you, with the back of your hand facing outward.",
+        "Extend your dominant hand with all fingers pointing straight upward and slightly apart.",
+        "Make a fist with your dominant hand and place your thumb against the side of your index finger.",
+        "With your dominant hand, make a fist and extend your pinky finger outward.",
+        "Hold your dominant hand in a flat, open position with all fingers together and extended.",
+        "Point your index finger upward with the rest of your fingers closed.",
+        "Extend your pinky finger while keeping your other fingers closed.",
+        "Make a fist with your dominant hand and extend your index and middle fingers upward, forming a \"peace sign\".",
+        "Extend your thumb and pinky finger while keeping your other fingers closed.",
+        "Place both hands in a fist position, then bring them together so that the back of each hand touches.",
+        "Hold your dominant hand in a fist position and extend your index and middle fingers forward.",
+        "Form a circle with your thumb and index finger, while keeping your other fingers closed.",
+        "Make a fist with your dominant hand and extend your thumb and pinky finger upward.",
+        "Create a circle with your thumb and index finger, and add your pinky finger, forming a \"three-finger salute.\"",
+        "With your dominant hand, make a fist and extend your index and middle fingers while keeping your other fingers closed.",
+        "Hold your dominant hand in a fist position and extend your thumb, index, and middle fingers upward, forming a \"hang loose\" sign.",
+        "Extend your index finger upward with the rest of your fingers closed.",
+        "Hold your dominant hand in a fist position and extend your pinky finger upward.",
+        "Make a \"peace sign\" with your dominant hand by extending your index and middle fingers.",
+        "Extend your thumb, index, and middle fingers forward while keeping your other fingers closed.",
+        "Cross your index finger over your middle finger to form an \"X\" shape.",
+        "Extend your pinky finger, while keeping your other fingers closed.",
+        "Hold your dominant hand in a fist position and extend your index finger forward, creating a \"pointing\" shape."
+    };
+
+    var fileFixes = new Dictionary<string, string>()
+    {
+        { "A", "https://signasl.files.wordpress.com/2015/11/file_001-4.jpeg?w=301&h=301" },
+        { "K", "https://signasl.files.wordpress.com/2015/12/img_5916.jpeg?w=302&h=302" }
+    };
 }
 
-<h2>@ViewBag.Title</h2>
+<div class="row container-fluid">
+
+    <div class="container mx-auto mb-2">
+        <h2 class="fw-bold text-light"><i class="fa-solid fa-hands-asl-interpreting me-2"></i>Signs</h2>
+    </div>
+
+    <div class="container row mx-auto">
+        @for (char letter = 'A'; letter <= 'Z'; letter++)
+        {
+            var index = letter - 'A';
+            var url = $"https://signasl.files.wordpress.com/2015/11/{$"{letter}".ToLower()}.jpg";
+
+            if (fileFixes.TryGetValue($"{letter}", out var existingUrl))
+            {
+                url = existingUrl;
+            }
+
+            <div class="col-6 col-md-3">
+                <div class="card border-0">
+                    <img src="@url"
+                         class="card-img-top rounded-3 shadow" style="height: 400px; object-fit: cover">
+                    <div class="card-body d-flex flex-column">
+                        <p class="card-title d-flex flex-row">
+                            <span class="fw-bold d-inline text-light me-2 h5">@letter</span>
+                        </p>
+                        <div class="card-text">
+                            @signs[index]
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
+</div>

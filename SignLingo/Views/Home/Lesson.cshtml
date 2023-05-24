@@ -1,0 +1,71 @@
+﻿@model SignLingo.Data.Activity
+
+@{
+    ViewBag.Title = $"{Model.ParentLesson.LessonTitle}";
+    Layout = "_Layout";
+}
+
+@if (ViewData["IsWelcomePage"] is true)
+{
+    <div class="container-fluid text-center d-flex my-auto mx-auto flex-column">
+        <img src="@Model.ParentLesson.LessonImage" class="img-fluid rounded-4 mb-2" style="height: 300px; object-fit: cover"/>
+        <h1 class="mb-3">@ViewBag.Title</h1>
+        <p class="mb-3">Ready? Press the button below!</p>
+        <div class="mx-auto">
+            <a href="/lessons/@Model.ParentLesson.Id/@Model.ParentLesson.ActivitySequence.First().Id" class="btn btn-success px-4 text-dark"><i class="fa-solid fa-play me-2"></i>Start</a>
+        </div>
+    </div>
+}
+else
+{
+    // Activity.
+    var word = Model.Word;
+    <div class="container-fluid mx-auto mb-2 text-center">
+        <partial name="Detection"/>
+    </div>
+    <p class="text-center fw-bold">Interpret the word:</p>
+    <h1 class="text-center fw-bold text-success">@word</h1>
+    <p id="words-read" class="text-center fw-bold text-danger">
+
+    </p>
+    <script>
+    let currentIndex = 0;
+    const targetWord = `@word`;
+    
+    let fixers = {
+        "w" : [ "k" ],
+        "m" : [ "n" ],
+        "n" : [ "m" ],
+    }
+    
+    function imageTrigger(letter)
+    {
+        if (!letter)
+            return;
+            
+        let targetLetter = targetWord[currentIndex].toLowerCase(),
+            trimmedLetter = letter.trim().toLowerCase();
+            
+        if (targetLetter === trimmedLetter || (trimmedLetter in fixers && fixers[trimmedLetter].includes(targetLetter)))
+        {
+            $("#words-read").append(targetLetter.toUpperCase());
+            currentIndex++;
+        }
+        if (currentIndex === targetWord.length)
+        {
+            @{
+                string location = $"/lessons/finished/{Model.ParentLesson.Id}";
+                var targetActivity = Model.ParentLesson.ActivitySequence.IndexOf(Model) + 1;
+
+                if (targetActivity < Model.ParentLesson.ActivitySequence.Count)
+                {
+                    location = $"/lessons/{Model.ParentLesson.Id}/{Model.ParentLesson.ActivitySequence[targetActivity].Id}";
+                }
+
+            }
+                document.location = `@location`;
+        }
+    }
+    
+    </script>
+}

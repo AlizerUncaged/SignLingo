@@ -16,9 +16,12 @@ public class Lesson
     /// </summary>
     public string LessonReviewer { get; set; } = string.Empty;
 
+
+    public List<LearnItems> Items { get; set; } = new();
+
     public string LessonImage { get; set; } = string.Empty;
 
 
-
-    public List<Activity> Activities { get; set; } = new();
+    public List<Activity> ActivitySequence { get; set; } = new();
+    
 }

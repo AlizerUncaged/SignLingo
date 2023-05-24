@@ -7,7 +7,7 @@
 }
 
 <div class="container position-relative mx-auto" id="liveview">
-    <div class="position-absolute start-0 top-0 container">
+    <div class="start-0 top-0 container">
         <video autoplay muted width="640" height="640" id="webcam"></video>
     </div>
     <div class="position-absolute start-0 top-0 container">
@@ -130,17 +130,14 @@ async function loadModel()
         cam.srcObject = stream;
         // cam.addEventListener('loadeddata', predictWebcam);
     });
-    detectVideo(cam, model, 0.2, document.getElementById("live-canvas"))
+    detectVideo(cam, model, 0, document.getElementById("live-canvas"))
 }
 
 loadModel();
 
-labels=[];
+labels = [];
 
-for (let i = 65; i <= 90; i++) {
-  const letter = String.fromCharCode(i);
-  labels.push(letter);
-}
+labels = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
 
 const renderBoxes = (
   canvasRef,
@@ -167,6 +164,11 @@ const renderBoxes = (
     // filter based on class threshold
     if (scores_data[i] > classThreshold) {
       const klass = labels[classes_data[i]];
+      
+      if (typeof imageTrigger === "function")
+      {
+        imageTrigger(klass);
+      }
       console.log(`Detected: ${klass}`)
       const color = colors.get(classes_data[i]);
       const score = (scores_data[i] * 100).toFixed(1);

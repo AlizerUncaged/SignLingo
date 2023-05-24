@@ -8,7 +8,11 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") ??
                        throw new InvalidOperationException("Connection string 'DefaultConnection' not found.");
-builder.Services.AddDbContext<ApplicationDbContext>(options => { options.UseSqlite(connectionString); }
+builder.Services.AddDbContext<ApplicationDbContext>(options =>
+    {
+        options.UseSqlite(connectionString);
+        options.EnableSensitiveDataLogging();
+    }
 );
 
 builder.Services.AddDatabaseDeveloperPageExceptionFilter();
@@ -29,6 +33,7 @@ builder.Services.AddDefaultIdentity<IdentityUser>(options =>
 
 builder.Services.AddControllersWithViews();
 builder.Services.AddTransient<ForceDown.DatabaseAbstract>();
+builder.Services.AddTransient<Seeder>();
 
 var app = builder.Build();
 
@@ -60,8 +65,11 @@ using (var serviceScope = app.Services.GetRequiredService<IServiceScopeFactory>(
 {
     var context = serviceScope.ServiceProvider.GetService<ApplicationDbContext>();
     var dbPort = serviceScope.ServiceProvider.GetService<DatabaseAbstract>();
-    await dbPort.GetDatabasePortAsync();
-    await context.Database.MigrateAsync();
+    var dbSeeder = serviceScope.ServiceProvider.GetService<Seeder>();
+    
+    await dbPort?.GetDatabasePortAsync();
+    await context?.Database.MigrateAsync();
+    await dbSeeder.SeedAsync();
 }
 
 app.Run();
