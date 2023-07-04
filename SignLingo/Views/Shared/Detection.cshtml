@@ -8,11 +8,12 @@
 
 <div class="container position-relative mx-auto" id="liveview">
     <div class="start-0 top-0 container">
-        <video autoplay muted width="640" height="640" id="webcam"></video>
+        <video class="rounded-3" autoplay muted width="640" id="webcam"></video>
     </div>
     <div class="position-absolute start-0 top-0 container">
-      <canvas id="live-canvas" width="640" height="640" 
-              style="z-index: 99; width: 640px !important; height: 640px !important;"></canvas>
+        <canvas id="live-canvas" width="640" height="500"
+                style="z-index: 99; width: 640px !important; height: 640px !important;">
+        </canvas>
     </div>
 </div>
 
@@ -122,6 +123,10 @@ async function loadModel()
     const dummyInput = tf.ones(model.inputs[0].shape);
     const warmupResult = await model.executeAsync(dummyInput);
     console.log(`Warmup result: ${warmupResult}`)
+    if (typeof warmupDone === 'function')
+      {
+        warmupDone();
+      }
     tf.dispose(warmupResult); // cleanup memory
     tf.dispose(dummyInput); // cleanup memory
     

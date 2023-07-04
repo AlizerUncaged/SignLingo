@@ -1,0 +1,19 @@
+﻿@using SignLingo.Data
+@model dynamic
+
+@{
+    ViewBag.Title = $"Failed | {Model.LessonTitle}";
+    Layout = "_Layout";
+
+    var lesson = (Lesson)Model.Lesson;
+}
+
+<div class="container-fluid text-center d-flex my-auto mx-auto flex-column">
+    <img src="@lesson.LessonImage" class="img-fluid rounded-4 mb-2" style="height: 300px; object-fit: cover"/>
+    <h1 class="mb-3 text-danger"><i class="fa-solid fa-trophy me-2"></i> @ViewBag.Title</h1>
+    <p class="mb-3 text-danger">Lesson Failed!</p>
+    <div class="mx-auto d-flex justify-content-center">
+        <a href="/" class="btn btn-success px-4 text-dark me-2"><i class="fa-solid fa-house me-2"></i>Home</a>
+        <a href="/lessons/@lesson.Id" class="btn btn-success px-4 text-dark"><i class="fa-solid fa-house me-2"></i>Retry</a>
+    </div>
+</div>

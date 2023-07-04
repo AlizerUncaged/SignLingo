@@ -21,7 +21,11 @@ public class Lesson
 
     public string LessonImage { get; set; } = string.Empty;
 
+    /// <summary>
+    /// Lesson time in seconds.
+    /// </summary>
+    public double LessonTime { get; set; } = 120;
+
 
     public List<Activity> ActivitySequence { get; set; } = new();
-    
 }

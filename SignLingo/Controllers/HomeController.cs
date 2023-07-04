@@ -64,8 +64,19 @@ public class HomeController : Controller
         return View();
     }
 
+    [HttpGet("/lessons/failed/{lessonId}")]
+    public async Task<IActionResult> FailedLesson(long lessonId, [FromQuery] long time)
+    {
+        return View(new
+        {
+            Lesson = await _dbContext.Lessons.FirstOrDefaultAsync(x => x.Id == lessonId),
+            Time = time
+        });
+    }
+
     [HttpGet("/lessons/finished/{lessonId}")]
-    public async Task<IActionResult> FinishedLesson(long lessonId)
+    public async Task<IActionResult> FinishedLesson(long lessonId,
+        [FromQuery] long time)
     {
         var currentUser = await _userManager.GetUserAsync(User);
 
@@ -86,7 +97,7 @@ public class HomeController : Controller
         var lesson = await _dbContext.Lessons.FirstOrDefaultAsync(x => x.Id == lessonId);
         if (lesson is null)
             return Content("Lesson doesn't exist!");
-        
+
         userMetadata.FinishedLessons.Add(lesson);
 
         _dbContext.UserMetadatas.Update(userMetadata);

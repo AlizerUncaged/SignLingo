@@ -11,6 +11,8 @@ public class ApplicationDbContext : IdentityDbContext
     public DbSet<Activity> Activities { get; set; }
 
     public DbSet<Lesson> Lessons { get; set; }
+    public DbSet<UserFinished> FinishedItems { get; set; }
+
 
     public DbSet<LearnItems> Items { get; set; }
 

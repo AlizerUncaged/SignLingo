@@ -3,6 +3,9 @@
 @{
     ViewBag.Title = $"{Model.ParentLesson.LessonTitle}";
     Layout = "_Layout";
+
+    var lastActivities = Model.ParentLesson.ActivitySequence.TakeWhile(x => x != Model);
+    var totalScore = lastActivities.Sum(x => x.Word.Length);
 }
 
 @if (ViewData["IsWelcomePage"] is true)
@@ -20,11 +23,19 @@ else
 {
     // Activity.
     var word = Model.Word;
-    <div class="container-fluid mx-auto mb-2 text-center">
+    
+    <p class="text-center text-success" id="score">
+        @totalScore
+    </p>
+    
+    <div class="container-fluid mx-auto text-center">
         <partial name="Detection"/>
     </div>
+    <p class="text-center text-danger fw-bold mb-2" id="countdown">
+
+    </p>
     <p class="text-center fw-bold">Interpret the word:</p>
-    <h1 class="text-center fw-bold text-success">@word</h1>
+    <h1 class="text-center fw-bold text-success mb-2">@word</h1>
     <p id="words-read" class="text-center fw-bold text-danger">
 
     </p>
@@ -36,6 +47,12 @@ else
         "w" : [ "k" ],
         "m" : [ "n" ],
         "n" : [ "m" ],
+    }
+    
+    function warmupDone()
+    {
+        // Usage
+        countdown(@Model.ParentLesson.LessonTime, '@Model.ParentLesson.Id');
     }
     
     function imageTrigger(letter)
@@ -51,6 +68,16 @@ else
             $("#words-read").append(targetLetter.toUpperCase());
             
             currentIndex++;
+            
+            // Retrieve the element by its ID
+            var scoreElement = document.getElementById("score");
+            
+            // Get the current score value and increment it
+            var currentScore = parseInt(scoreElement.textContent);
+            var newScore = currentScore + 1;
+            
+            // Update the element's text content with the new score
+            scoreElement.textContent = newScore;
             
             while(currentIndex === targetWord.length && targetWord[currentIndex] === ' ')
             {
@@ -72,6 +99,32 @@ else
                 document.location = `@location`;
         }
     }
+    
+    function countdown(seconds, lessonId) {
+            let totalSeconds = seconds;
+            
+            const countdownElement = document.getElementById('countdown');
+            
+            countdownElement.textContent = formatTime(seconds);
+            
+            const countdownInterval = setInterval(() => {
+            totalSeconds--;
+            
+            countdownElement.textContent = formatTime(totalSeconds);
+            
+            if (totalSeconds === 0) {
+                clearInterval(countdownInterval);
+                window.location.href = `/lessons/failed/${lessonId}`;
+            }
+        }, 1000);
+    }
+    
+    function formatTime(seconds) {
+        const formattedSeconds = String(seconds % 60).padStart(2, '0');
+        
+        return `${formattedSeconds}`;
+    }
+
     
     </script>
 }
