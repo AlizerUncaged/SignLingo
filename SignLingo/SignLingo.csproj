@@ -24,9 +24,6 @@
     </ItemGroup>
 
     <ItemGroup>
-      <Reference Include="Microsoft.Database.Abstractions">
-        <HintPath>..\..\ForceDown\ForceDown\bin\Debug\net7.0\Microsoft.Database.Abstractions.dll</HintPath>
-      </Reference>
     </ItemGroup>
 
 </Project>
